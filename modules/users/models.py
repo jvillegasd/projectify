@@ -9,3 +9,7 @@ class User(Document):
   password = PasswordField(required=True)
   created_at = DateTimeField(default=datetime.datetime.utcnow)
   updated_at = DateTimeField(default=datetime.datetime.utcnow)
+
+  def save(self, *args, **kwargs):
+    self.updated_at = datetime.datetime.utcnow()
+    super(User, self).save(*args, **kwargs)
