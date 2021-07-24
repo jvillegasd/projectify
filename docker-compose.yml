@@ -1,0 +1,47 @@
+version: '3.7'
+
+services:
+  backend-projectify:
+    container_name: backend-projectify
+    build: .
+    command: python3 app.py
+    env_file: .env
+    restart: always
+    volumes:
+      - ./:/src
+    ports:
+      - ${FLASK_PORT}:${FLASK_PORT}
+    networks:
+      - projectify-net
+  db-projectify:
+    image: mongo:latest
+    container_name: db-projectify
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGODB_DATABASE}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+    volumes:
+      - mongodb:/data/db
+    ports:
+      - ${MONGODB_PORT}:${MONGODB_PORT}
+    networks:
+      - projectify-net
+  redis-projectify:
+    image: redis:6.0.5-alpine
+    container_name: redis-projectify
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    networks:
+      - projectify-net
+
+volumes:
+  mongodb:
+  redis-data:
+
+networks:
+  projectify-net:
+    driver: bridge
