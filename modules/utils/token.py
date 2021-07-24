@@ -10,7 +10,8 @@ def get_info_from_token(token):
 
   token_info = {
     'username': decoded_token['sub'],
-    'name': decoded_token['name']
+    'name': decoded_token['name'],
+    'doc_id': decoded_token['doc_id']
   }
 
   return token_info

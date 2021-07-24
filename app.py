@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask import Flask, jsonify, json
 from werkzeug.exceptions import HTTPException
 
-from modules import user_blueprint
+from modules import user_blueprint, project_blueprint
 
 env = Env()
 env.read_env()
@@ -16,6 +16,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 # Add blueprints to main app
 app.register_blueprint(user_blueprint, url_prefix='/users')
+app.register_blueprint(project_blueprint, url_prefix='/projects')
 
 # Ping
 @app.route('/')
