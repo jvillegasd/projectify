@@ -3,6 +3,7 @@ import datetime
 from environs import Env
 from flask import request, Blueprint, jsonify, abort
 from middlewares.schemas import parameters
+from middlewares.auth import jwt_required
 from modules.users.serializers import CreateUserSchema, AuthTokenSchema
 from modules.users.models import User
 
@@ -15,9 +16,15 @@ user_blueprint = Blueprint('User controller', __name__)
 @user_blueprint.route('/', methods=['POST'])
 @parameters(schema=CreateUserSchema())
 def create():
-  new_user = User(**request.get_json())
-  new_user.save()
-  return jsonify({ 'message': 'user created' }), 200
+  body = request.get_json()
+
+  db_user = User.objects.get(username=body['username'])
+  if db_user:
+    abort(409, 'user exists')
+  else:
+    new_user = User(**body)
+    new_user.save()
+    return jsonify({ 'message': 'user created' }), 200
 
 @user_blueprint.route('/token', methods=['POST'])
 @parameters(schema=AuthTokenSchema())
@@ -29,9 +36,10 @@ def get_token():
     expiration_date = datetime.datetime.now() + datetime.timedelta(days=1)
     auth_token = jwt.encode({
       'sub': db_user.username,
+      'name': db_user.name,
       'exp': expiration_date,
       'iat': datetime.datetime.now(),
-    }, JWT_KEY)
+    }, JWT_KEY, algorithm='HS256')
 
     return jsonify({ 'token': f'Bearer {auth_token}' }), 200
   else:
