@@ -28,3 +28,10 @@ class PasswordField(StringField):
       'salt': self.salt,
       'password': value
     }
+
+def check_user_existance(username, email):
+  from modules.users.models import User
+
+  query = Q(username=username) | Q(email=email)
+  db_users = User.objects.filter(query)
+  return True if db_users else False

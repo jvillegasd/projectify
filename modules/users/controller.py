@@ -6,6 +6,7 @@ from middlewares.schemas import parameters
 from middlewares.auth import jwt_required
 from modules.users.serializers import CreateUserSchema, AuthTokenSchema
 from modules.users.models import User
+from modules.users.utils import check_user_existance
 
 env = Env()
 env.read_env()
@@ -18,8 +19,7 @@ user_blueprint = Blueprint('User controller', __name__)
 def create():
   body = request.get_json()
 
-  db_user = User.objects.get(username=body['username'])
-  if db_user:
+  if check_user_existance(body['username'], body['email']):
     abort(409, 'user exists')
   else:
     new_user = User(**body)
