@@ -1,11 +1,13 @@
+import uuid
 import datetime
-from mongoengine import DateTimeField, Document
+from mongoengine import DateTimeField, Document, UUIDField
 
 class DocumentMixin(Document):
+  doc_id = UUIDField(default=uuid.uuid4, primary_key=True)
   created_at = DateTimeField(default=datetime.datetime.utcnow)
   updated_at = DateTimeField(default=datetime.datetime.utcnow)
 
-  meta = { 'allow_inheritance': True }
+  meta = { 'abstract': True }
 
   def __init__(self, **kwargs):
     super().__init__(**kwargs)

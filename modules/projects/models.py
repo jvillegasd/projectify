@@ -3,12 +3,12 @@ from modules.users.models import User
 from mongoengine import *
 
 class Project(DocumentMixin):
-  name = StringField(required=True)
+  name = StringField(required=True, unique=True)
   description = StringField(max_length=1250)
 
 class Report(DocumentMixin):
-  project = ReferenceField(Project, required=True, reverse_delete_rule=CASCADE)
-  user = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)
+  project_id = ReferenceField(Project, required=True, reverse_delete_rule=CASCADE)
+  user_id = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)
   dedication_percentage = FloatField(required=True)
   iso_year = IntField()
   iso_week = IntField()

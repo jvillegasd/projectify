@@ -3,7 +3,6 @@ import datetime
 from environs import Env
 from flask import request, Blueprint, jsonify, abort
 from middlewares.schemas import parameters
-from middlewares.auth import jwt_required
 from modules.users.serializers import CreateUserSchema, AuthTokenSchema
 from modules.users.models import User
 from modules.users.utils import check_user_existance
@@ -31,12 +30,13 @@ def create():
 def get_token():
   body = request.get_json()
 
-  db_user = User.objects.get(username=body['username'])
+  db_user = User.objects.filter(username=body['username']).first()
   if db_user and db_user.check_password(body['password']):
     expiration_date = datetime.datetime.now() + datetime.timedelta(days=1)
     auth_token = jwt.encode({
       'sub': db_user.username,
       'name': db_user.name,
+      'doc_id': str(db_user.doc_id),
       'exp': expiration_date,
       'iat': datetime.datetime.now(),
     }, JWT_KEY, algorithm='HS256')
