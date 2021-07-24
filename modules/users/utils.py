@@ -1,4 +1,3 @@
-# https://github.com/MongoEngine/extras-mongoengine/issues/8
 import bcrypt
 from environs import Env
 from mongoengine import *
@@ -10,16 +9,16 @@ class PasswordField(StringField):
 
   SALT_ROUNDS = int(env('SALT_ROUNDS'))
 
-  def __init__(self, **kwargs):
-    self.salt = bcrypt.gensalt(rounds=SALT_ROUNDS)
-    super(PasswordField, self).__init__(kwargs)
+  def __init__(self, regex=None, **kwargs):
+    self.salt = bcrypt.gensalt(rounds=PasswordField.SALT_ROUNDS)
+    super(PasswordField, self).__init__(**kwargs)
   
-  def set_password(self, password):
-    password = bcrypt.hashpw(password, self.salt)
-    return password
+  def __set_password(self, password):
+    password = bcrypt.hashpw(password.encode('utf8'), self.salt)
+    return password.decode('utf8')
   
   def to_mongo(self, value):
-    return self.set_password(value)
+    return self.__set_password(value)
   
   def to_python(self, value):
     return value

@@ -1,6 +1,6 @@
 import datetime
 from mongoengine import *
-from utils import PasswordField
+from modules.users.utils import PasswordField
 
 class User(Document):
   name = StringField(required=True)
