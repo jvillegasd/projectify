@@ -14,6 +14,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {'origins': '*'}})
 app.config['CORS_HEADERS'] = 'Content-Type'
 
+# Add blueprints to main app
 app.register_blueprint(user_blueprint, url_prefix='/users')
 
 # Ping
