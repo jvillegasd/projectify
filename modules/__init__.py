@@ -1,5 +1,6 @@
 from environs import Env
 from mongoengine import connect
+from modules.users.controller import user_blueprint
 
 env = Env()
 env.read_env()

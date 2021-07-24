@@ -2,7 +2,7 @@ from environs import Env
 from flask_cors import CORS
 from flask import Flask, jsonify
 
-from modules.users.controller import user_blueprint
+from modules import user_blueprint
 
 env = Env()
 env.read_env()
