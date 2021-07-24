@@ -1,12 +1,12 @@
 from functools import wraps
 from flask import request, jsonify, abort
 
-def required_schema(schema):
+def parameters(schema):
 
   def decorator(endpoint):
 
     @wraps(endpoint)
-    def wrapper(*args, ***kwargs):
+    def wrapper(*args, **kwargs):
       errors = schema.validate(request.get_json())
       if errors:
         abort(400, str(errors))
