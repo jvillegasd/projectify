@@ -27,11 +27,11 @@ def ping():
 def handle_exception(e):
   response = e.get_response()
   response.data = json.dumps({
-    "code": e.code,
-    "name": e.name,
-    "description": e.description,
+    'code': e.code,
+    'name': e.name,
+    'description': e.description,
   })
-  response.content_type = "application/json"
+  response.content_type = 'application/json'
   return response
 
 if __name__ == '__main__':
