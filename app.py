@@ -10,6 +10,12 @@ env.read_env()
 
 app = Flask(__name__)
 
+# Limiting file size
+app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024 # 3mb
+
+# Validating file extensions
+app.config['UPLOAD_EXTENSIONS'] = ['.xlsx', '.xls', '.csv']
+
 # CORS for frontend application
 CORS(app, resources={r"/*": {'origins': '*'}})
 app.config['CORS_HEADERS'] = 'Content-Type'

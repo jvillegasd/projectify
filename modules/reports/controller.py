@@ -67,3 +67,9 @@ def edit(report_id):
     return jsonify({ 'message': 'report updated' }), 200
   else:
     abort(400, 'report cannot be edited')
+
+@report_blueprint.route('/upload', methods=['POST'])
+@jwt_required
+@parameters(schema=serializers.UploadReportSchema())
+def upload_records():
+  uploaded_file = request.files['file']
