@@ -5,8 +5,8 @@ from modules.projects.models import Project
 from mongoengine import *
 
 class Report(DocumentMixin):
-  project = ReferenceField(Project, required=True, reverse_delete_rule=CASCADE)
-  user = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)
+  project = ReferenceField(Project, required=True, dbref=False, reverse_delete_rule=CASCADE)
+  user = ReferenceField(User, required=True, dbref=False, reverse_delete_rule=CASCADE)
   dedication_percentage = FloatField(required=True)
   report_date = DateTimeField(default=datetime.datetime.now)
   report_iso_year = IntField()
