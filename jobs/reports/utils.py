@@ -1,19 +1,38 @@
 import os
+import uuid
 import pandas as pd
 
 def get_file_extension(filename):
   file_ext = os.path.splitext(filename)[1]
   return file_ext
 
-def sanitize_duplicate_reports(df):
-  pass
+def sanitize_reports(df, user_id):
+  df['user'] = user_id
 
-def file_to_dic(filename):
+  df['user'] = df['user'].apply(lambda x: uuid.UUID(x))
+  df['project'] = df['project_id'].apply(lambda x: uuid.UUID(x))
+
+  df.drop('project_id', axis=1, inplace=True)
+
+  df['report_date'] = pd.to_datetime(df['report_date'], format='%Y-%m-%d')
+  df['report_iso_year'] = df['report_date'].apply(lambda x: x.isocalendar()[0])
+  df['report_iso_week'] = df['report_date'].apply(lambda x: x.isocalendar()[1])
+
+  # Delete duplicates
+  sanitized_df = df.drop_duplicates(['project', 'user', 'report_iso_year', 'report_iso_week'], keep='first')
+  return sanitized_df
+
+def file_to_dataframe(filename):
+  path = os.path.join('temp', filename)
+
   file_ext = get_file_extension(filename)
   if file_ext in ['.xlsx', '.xls']:
-    df = pd.read_excel(filename)
+    df = pd.read_excel(path)
   else:
-    df = pd.read_csv(filename)
+    df = pd.read_csv(path)
   
-  sanitized_df = sanitize_duplicate_reports(df)
-  
+  return df
+
+def delete_file(filename):
+  path = os.path.join('temp', filename)
+  os.remove(path)
