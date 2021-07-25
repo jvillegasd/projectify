@@ -12,6 +12,19 @@ class Report(DocumentMixin):
   report_iso_year = IntField()
   report_iso_week = IntField()
 
+  meta = {
+    'indexes': [
+        {'fields': (
+            'project',
+            'user',
+            'report_iso_year',
+            'report_iso_week'
+          ), 
+          'unique': True
+        }
+    ]
+  }
+
   def save(self, *args, **kwargs):
     iso_date = self.report_date.isocalendar()
     if not self.report_iso_year:
