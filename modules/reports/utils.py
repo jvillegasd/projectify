@@ -16,3 +16,25 @@ def report_already_done(project, user, report_date):
 
   return True if db_report else False
 
+def can_edit_report(report_id, edit_date):
+  edit_date = datetime.datetime.strptime(edit_date, '%Y-%m-%d')
+  pipeline = [
+    {
+      '$project': {
+        'month': { '$month': '$report_date' },
+        'year': { '$year': '$report_date' }
+      }
+    },
+    {
+      '$match': {
+        'month': edit_date.month,
+        'year': edit_date.year
+      }
+    }
+  ]
+
+  db_report = Report.objects.filter(
+    doc_id=report_id
+  ).aggregate(pipeline)
+  
+  return True if list(db_report) else False

@@ -6,7 +6,7 @@ from middlewares.auth import jwt_required
 from modules.reports.models import Report
 from modules.users.models import User
 from modules.projects.models import Project
-from modules.reports.utils import report_already_done
+from modules.reports.utils import report_already_done, can_edit_report
 from modules.utils.token import get_info_from_token
 
 report_blueprint = Blueprint('Report controller', __name__)
@@ -57,21 +57,13 @@ def reports_list():
 @report_blueprint.route('/<report_id>', methods=['PUT'])
 @jwt_required
 @parameters(schema=serializers.ReportEditSchema())
-def edit():
+def edit(report_id):
   body = request.get_json()
-  auth_header = request.headers['Authorization'].split('Bearer ')[1]
-  decoded_token = get_info_from_token(auth_header)
-
-  if report_already_done(body['project_id'], body['user_id'], body['edit_date']):
-    abort(405, 'weekly report already done')
-  else:
-    user = User.objects.filter(doc_id=decoded_token['doc_id']).first()
-    project = Project.objects.filter(doc_id=body['project_id']).first()
-    db_report = Report.objects.filter(
-      project=project,
-      user=user
-    ).first()
-
+  
+  if can_edit_report(report_id, body['edit_date']):
+    db_report = Report.objects.filter(doc_id=report_id).first()
     db_report.dedication_percentage = body['dedication_percentage']
     db_report.save()
-    return jsonify({ 'message': 'report created' }), 200
+    return jsonify({ 'message': 'report updated' }), 200
+  else:
+    abort(400, 'report cannot be edited')
