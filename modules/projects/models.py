@@ -3,5 +3,5 @@ from modules.users.models import User
 from mongoengine import *
 
 class Project(DocumentMixin):
-  name = StringField(required=True, unique)
+  name = StringField(required=True, unique=True)
   description = StringField(max_length=1250)
