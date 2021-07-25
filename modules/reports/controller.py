@@ -8,6 +8,7 @@ from modules.users.models import User
 from modules.projects.models import Project
 from modules.reports.utils import report_already_done, can_edit_report, secure_file_save
 from modules.utils.token import get_info_from_token
+from jobs.reports import process_uploaded_document
 
 report_blueprint = Blueprint('Report controller', __name__)
 
@@ -72,6 +73,11 @@ def edit(report_id):
 @jwt_required
 @parameters(schema=serializers.UploadReportSchema())
 def upload_records():
+  auth_header = request.headers['Authorization'].split('Bearer ')[1]
+  decoded_token = get_info_from_token(auth_header)
   uploaded_file = request.files['file']
+
   new_filename = secure_file_save(uploaded_file)
-  return '', 204
+  job = process_uploaded_document.delay(new_filename, decoded_token['doc_id'])
+  
+  return jsonify({ 'job_id': job.id }), 200

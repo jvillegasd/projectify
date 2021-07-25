@@ -13,6 +13,18 @@ services:
       - ${FLASK_PORT}:${FLASK_PORT}
     networks:
       - projectify-net
+  worker-projectify:
+    container_name: worker-projectify
+    build: .
+    command: python3 worker.py
+    env_file: .env
+    restart: always
+    depends_on:
+      - redis-projectify
+    volumes:
+      - ./:/src
+    networks:
+      - projectify-net
   db-projectify:
     image: mongo:latest
     container_name: db-projectify
