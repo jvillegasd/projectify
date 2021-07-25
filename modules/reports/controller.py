@@ -1,7 +1,6 @@
 import uuid
 import datetime
 import modules.reports.serializers as serializers
-from bson.objectid import ObjectId
 from flask import request, Blueprint, jsonify, abort
 from middlewares.schemas import parameters
 from middlewares.auth import jwt_required
