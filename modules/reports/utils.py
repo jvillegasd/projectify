@@ -47,3 +47,5 @@ def secure_file_save(uploaded_file):
   file_ext = os.path.splitext(uploaded_file.filename)[1]
   new_filename+=file_ext
   uploaded_file.save(os.path.join('temp', new_filename))
+
+  return new_filename
