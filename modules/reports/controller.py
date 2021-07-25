@@ -6,7 +6,7 @@ from middlewares.auth import jwt_required
 from modules.reports.models import Report
 from modules.users.models import User
 from modules.projects.models import Project
-from modules.reports.utils import report_already_done, can_edit_report
+from modules.reports.utils import report_already_done, can_edit_report, secure_file_save
 from modules.utils.token import get_info_from_token
 
 report_blueprint = Blueprint('Report controller', __name__)
@@ -73,5 +73,5 @@ def edit(report_id):
 @parameters(schema=serializers.UploadReportSchema())
 def upload_records():
   uploaded_file = request.files['file']
-  uploaded_file.save(uploaded_file.filename)
-  return 'ok'
+  secure_file_save(uploaded_file)
+  return '', 204
