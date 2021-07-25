@@ -1,6 +1,6 @@
 import os
 from flask import current_app
-from marshmallow import Schema, fields, validate
+from marshmallow import Schema, fields, validate, pre_load
 from marshmallow.exceptions import ValidationError
 from modules.projects.serializers import ProjectDetailSchema
 
@@ -25,12 +25,14 @@ class ReportEditSchema(Schema):
                           validate=validate.Range(1, 100))
 
 class UploadReportSchema(Schema):
-  file = fields.Raw(type='file', required=True)
+  filename = fields.String(required=True)
 
   @pre_load
   def check_file_extension(self, data, **kwargs):
-    filename = data['file'].filename
+    filename = data['filename']
     if filename:
       file_ext = os.path.splitext(filename)[1]
       if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
         raise ValidationError('invalid file extension')
+    
+    return data

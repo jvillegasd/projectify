@@ -73,3 +73,5 @@ def edit(report_id):
 @parameters(schema=serializers.UploadReportSchema())
 def upload_records():
   uploaded_file = request.files['file']
+  uploaded_file.save(uploaded_file.filename)
+  return 'ok'
