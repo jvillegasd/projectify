@@ -1,5 +1,7 @@
+import uuid
 import datetime
 import modules.reports.serializers as serializers
+from bson.objectid import ObjectId
 from flask import request, Blueprint, jsonify, abort
 from middlewares.schemas import parameters
 from middlewares.auth import jwt_required
@@ -29,8 +31,8 @@ def create():
   else:
     report_date = datetime.datetime.strptime(body['report_date'], '%Y-%m-%d')
     new_report = Report(
-      project=project,
-      user=user,
+      project=uuid.UUID(body['project_id']),
+      user=uuid.UUID(decoded_token['doc_id']),
       report_date=report_date,
       dedication_percentage=body['dedication_percentage']
     )
@@ -47,7 +49,7 @@ def reports_list():
   items_per_page = 15
   offset = (page - 1) * items_per_page
 
-  user = User.objects.filter(doc_id=decoded_token['doc_id']).first()
+  user = uuid.UUID(decoded_token['doc_id'])
   reports = Report.objects.filter(user=user)
   reports = reports.skip(offset).limit(items_per_page)
   reports = serializers.ReportDetailSchema(many=True).dump(reports)
