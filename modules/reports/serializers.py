@@ -36,3 +36,7 @@ class UploadReportSchema(Schema):
         raise ValidationError('invalid file extension')
     
     return data
+
+class RequestReportFile(Schema):
+  start_date = fields.Date(required=True)
+  end_date = fields.Date(required=True)

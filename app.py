@@ -10,6 +10,9 @@ env.read_env()
 
 app = Flask(__name__)
 
+# Temp files folder
+app.config['UPLOAD_FOLDER'] = 'temp'
+
 # Limiting file size
 app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024 # 3mb
 

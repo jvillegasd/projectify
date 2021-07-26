@@ -1,15 +1,19 @@
+import os
 import uuid
 import datetime
 import modules.reports.serializers as serializers
-from flask import request, Blueprint, jsonify, abort
+from flask import request, Blueprint, jsonify, abort, send_from_directory, \
+  current_app
 from middlewares.schemas import parameters
 from middlewares.auth import jwt_required
 from modules.reports.models import Report
 from modules.users.models import User
 from modules.projects.models import Project
-from modules.reports.utils import report_already_done, can_edit_report, secure_file_save
+from modules.reports.utils import report_already_done, can_edit_report, \
+  secure_file_save
 from modules.utils.token import get_info_from_token
-from jobs.reports import process_uploaded_document
+from jobs.reports import process_uploaded_document, generate_report_document
+from jobs.utils import get_job_result
 
 report_blueprint = Blueprint('Report controller', __name__)
 
@@ -45,7 +49,7 @@ def reports_list():
   auth_header = request.headers['Authorization'].split('Bearer ')[1]
   decoded_token = get_info_from_token(auth_header)
 
-  page = 1 if not 'page' in request.args else int(request.args.get['page'])
+  page = 1 if not 'page' in request.args else int(request.args['page'])
   items_per_page = 15
   offset = (page - 1) * items_per_page
 
@@ -82,3 +86,32 @@ def upload_records():
   job = process_uploaded_document.delay(new_filename, decoded_token['doc_id'])
   
   return jsonify({ 'job_id': job.id }), 200
+
+@report_blueprint.route('/download', methods=['POST'])
+@jwt_required
+@parameters(schema=serializers.RequestReportFile())
+def enqueue_download_records():
+  body = request.get_json()
+  job = generate_report_document.delay(**body)
+  return jsonify({
+    'job_id': job.id, 
+    'message': 'file will be deleted in 5 minutes' }), 200
+
+@report_blueprint.route('/download/<job_id>', methods=['GET'])
+@jwt_required
+def download_records(job_id):
+  from rq.exceptions import NoSuchJobError
+
+  try:
+    result, status = get_job_result(job_id)
+    
+    if result:
+      path = os.path.join(current_app.config['UPLOAD_FOLDER'], result)
+      if os.path.exists(path):
+        return send_from_directory(current_app.config['UPLOAD_FOLDER'], result, as_attachment=True)
+      else:
+        abort(404, 'file not found')
+    else:
+      return jsonify({ 'message': status }), 202
+  except NoSuchJobError:
+    abort(404, 'job nor found')
