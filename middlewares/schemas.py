@@ -1,13 +1,18 @@
 from functools import wraps
 from flask import request, jsonify, abort
 
-def parameters(schema):
+def parameters(schema, upload_file=False):
 
   def decorator(endpoint):
 
     @wraps(endpoint)
     def wrapper(*args, **kwargs):
-      errors = schema.validate(request.get_json())
+      body = request.get_json() or dict()
+
+      if 'file' in request.files:
+        body['filename'] = request.files['file'].filename
+      
+      errors = schema.validate(body)
       if errors:
         abort(400, str(errors))
       else:

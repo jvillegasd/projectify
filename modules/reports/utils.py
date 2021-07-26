@@ -38,3 +38,14 @@ def can_edit_report(report_id, edit_date):
   ).aggregate(pipeline)
   
   return True if list(db_report) else False
+
+def secure_file_save(uploaded_file):
+  import os
+  import uuid
+
+  new_filename = str(uuid.uuid4())
+  file_ext = os.path.splitext(uploaded_file.filename)[1]
+  new_filename+=file_ext
+  uploaded_file.save(os.path.join('temp', new_filename))
+
+  return new_filename

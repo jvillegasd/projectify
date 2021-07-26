@@ -1,3 +1,4 @@
+from jobs import schedulers
 from environs import Env
 from flask_cors import CORS
 from flask import Flask, jsonify, json
@@ -9,6 +10,15 @@ env = Env()
 env.read_env()
 
 app = Flask(__name__)
+
+# Temp files folder
+app.config['UPLOAD_FOLDER'] = 'temp'
+
+# Limiting file size
+app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024 # 3mb
+
+# Validating file extensions
+app.config['UPLOAD_EXTENSIONS'] = ['.xlsx', '.xls', '.csv']
 
 # CORS for frontend application
 CORS(app, resources={r"/*": {'origins': '*'}})
