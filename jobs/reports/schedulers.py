@@ -1,7 +1,8 @@
 import os
+from constants import UPLOAD_FOLDER
 
 def delete_temp_files():
-  files = os.listdir('temp')
+  files = os.listdir(UPLOAD_FOLDER)
   
   filtered_files = [
     file
@@ -14,5 +15,5 @@ def delete_temp_files():
   ]
 
   for file in filtered_files:
-    path = os.path.join('temp', file)
+    path = os.path.join(UPLOAD_FOLDER, file)
     os.remove(path)

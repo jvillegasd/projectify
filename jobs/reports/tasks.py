@@ -27,12 +27,13 @@ def process_uploaded_document(filename, user_id):
 
 @job('docs', connection=redis_conn, timeout=600)
 def generate_report_document(start_date, end_date):
+  from constants import UPLOAD_FOLDER
   from pandas.io.json import json_normalize
   from modules.reports.models import Report
   from modules.reports.serializers import ReportDetailSchema
 
   filename = str(uuid.uuid4()) + '.xlsx'
-  path = os.path.join('temp', filename)
+  path = os.path.join(UPLOAD_FOLDER, filename)
 
   start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d')
   end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d')

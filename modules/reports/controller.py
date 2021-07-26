@@ -2,8 +2,7 @@ import os
 import uuid
 import datetime
 import modules.reports.serializers as serializers
-from flask import request, Blueprint, jsonify, abort, send_from_directory, \
-  current_app
+from flask import request, Blueprint, jsonify, abort, send_from_directory
 from middlewares.schemas import parameters
 from middlewares.auth import jwt_required
 from modules.reports.models import Report
@@ -101,14 +100,15 @@ def enqueue_download_records():
 @jwt_required
 def download_records(job_id):
   from rq.exceptions import NoSuchJobError
+  from constants import UPLOAD_FOLDER
 
   try:
     result, status = get_job_result(job_id)
     
     if result:
-      path = os.path.join(current_app.config['UPLOAD_FOLDER'], result)
+      path = os.path.join(UPLOAD_FOLDER, result)
       if os.path.exists(path):
-        return send_from_directory(current_app.config['UPLOAD_FOLDER'], result, as_attachment=True)
+        return send_from_directory(UPLOAD_FOLDER, result, as_attachment=True)
       else:
         abort(404, 'file not found')
     else:

@@ -1,6 +1,7 @@
 import os
 import uuid
 import pandas as pd
+from constants import UPLOAD_FOLDER
 
 def get_file_extension(filename):
   file_ext = os.path.splitext(filename)[1]
@@ -23,7 +24,7 @@ def sanitize_reports(df, user_id):
   return sanitized_df
 
 def file_to_dataframe(filename):
-  path = os.path.join('temp', filename)
+  path = os.path.join(UPLOAD_FOLDER, filename)
 
   file_ext = get_file_extension(filename)
   if file_ext in ['.xlsx', '.xls']:
@@ -34,5 +35,5 @@ def file_to_dataframe(filename):
   return df
 
 def delete_file(filename):
-  path = os.path.join('temp', filename)
+  path = os.path.join(UPLOAD_FOLDER, filename)
   os.remove(path)

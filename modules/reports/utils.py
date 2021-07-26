@@ -42,10 +42,11 @@ def can_edit_report(report_id, edit_date):
 def secure_file_save(uploaded_file):
   import os
   import uuid
+  from constants import UPLOAD_FOLDER
 
   new_filename = str(uuid.uuid4())
   file_ext = os.path.splitext(uploaded_file.filename)[1]
   new_filename+=file_ext
-  uploaded_file.save(os.path.join('temp', new_filename))
+  uploaded_file.save(os.path.join(UPLOAD_FOLDER, new_filename))
 
   return new_filename
