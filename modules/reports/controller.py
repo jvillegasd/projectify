@@ -12,7 +12,7 @@ from modules.reports.utils import report_already_done, can_edit_report, \
   secure_file_save
 from modules.utils.token import get_info_from_token
 from jobs.reports import process_uploaded_document, generate_report_document
-from jobs.utils import get_job_result
+from jobs.utils import get_job_status
 
 report_blueprint = Blueprint('Report controller', __name__)
 
@@ -92,26 +92,24 @@ def upload_records():
 def enqueue_download_records():
   body = request.get_json()
   job = generate_report_document.delay(**body)
-  return jsonify({
-    'job_id': job.id, 
-    'message': 'file will be deleted in 5 minutes' }), 200
+  return jsonify({ 'job_id': job.id }), 200
 
 @report_blueprint.route('/download/<job_id>', methods=['GET'])
 @jwt_required
 def download_records(job_id):
-  from rq.exceptions import NoSuchJobError
-  from constants import UPLOAD_FOLDER
+  from jobs.models import AsyncResult
+  from utils import create_presigned_url_s3
 
-  try:
-    result, status = get_job_result(job_id)
-    
-    if result:
-      path = os.path.join(UPLOAD_FOLDER, result)
-      if os.path.exists(path):
-        return send_from_directory(UPLOAD_FOLDER, result, as_attachment=True)
-      else:
-        abort(404, 'file not found')
+  record = AsyncResult.objects.filter(job_id=job_id).first()
+  job_status = get_job_status(job_id)
+  
+  if job_status == 'finished' or record:
+    url = create_presigned_url_s3(record.object_name)
+    if url:
+      return jsonify({ 'file_url': url }), 200
     else:
-      return jsonify({ 'message': status }), 202
-  except NoSuchJobError:
-    abort(404, 'job nor found')
+      abort(404, 'file not found in s3 bucket')
+  elif job_status != 'not_found':
+    return jsonify({ 'message': job_status }), 202
+  else:
+    abort(404, 'job not found')

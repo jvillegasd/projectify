@@ -14,3 +14,4 @@ redis==3.5.3
 openpyxl==3.0.7
 APScheduler==3.7.0
 dnspython==2.1.0
+boto3==1.18.6

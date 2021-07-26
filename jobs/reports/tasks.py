@@ -2,15 +2,21 @@ import os
 import uuid
 import datetime
 from rq.decorators import job
+from rq import get_current_job
 from worker import conn as redis_conn
-from jobs.reports.utils import file_to_dataframe, sanitize_reports, delete_file
+from jobs.reports.utils import file_to_dataframe, sanitize_reports
+from utils import delete_file
 from pymongo.errors import BulkWriteError
+
+from utils import upload_file_to_s3, download_file_from_s3
 
 @job('docs', connection=redis_conn, timeout=600)
 def process_uploaded_document(filename, user_id):
   from modules.reports.models import Report
 
   try:
+    download_file_from_s3(filename)
+
     df = file_to_dataframe(filename)
     sanitized_df = sanitize_reports(df, user_id)
     reports_dict = sanitized_df.to_dict('records')
@@ -31,6 +37,9 @@ def generate_report_document(start_date, end_date):
   from pandas.io.json import json_normalize
   from modules.reports.models import Report
   from modules.reports.serializers import ReportDetailSchema
+  from jobs.models import AsyncResult
+
+  job = get_current_job()
 
   filename = str(uuid.uuid4()) + '.xlsx'
   path = os.path.join(UPLOAD_FOLDER, filename)
@@ -52,4 +61,12 @@ def generate_report_document(start_date, end_date):
     'updated_at'
   ], axis=1, inplace=True)
   df.to_excel(path, index=False)
-  return filename
+
+  upload_file_to_s3(filename)
+  delete_file(filename)
+
+  new_record = AsyncResult(
+    job_id=job.id,
+    object_name=filename
+  )
+  new_record.save()

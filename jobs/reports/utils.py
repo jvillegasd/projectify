@@ -33,7 +33,3 @@ def file_to_dataframe(filename):
     df = pd.read_csv(path)
   
   return df
-
-def delete_file(filename):
-  path = os.path.join(UPLOAD_FOLDER, filename)
-  os.remove(path)

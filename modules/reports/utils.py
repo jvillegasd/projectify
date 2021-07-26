@@ -1,5 +1,6 @@
 import datetime
 from modules.reports.models import Report
+from utils import upload_fileobj_to_s3, delete_file
 
 def report_already_done(project, user, report_date):
   report_date = datetime.datetime.strptime(report_date, '%Y-%m-%d')
@@ -47,6 +48,5 @@ def secure_file_save(uploaded_file):
   new_filename = str(uuid.uuid4())
   file_ext = os.path.splitext(uploaded_file.filename)[1]
   new_filename+=file_ext
-  uploaded_file.save(os.path.join(UPLOAD_FOLDER, new_filename))
-
+  upload_fileobj_to_s3(uploaded_file, new_filename)
   return new_filename
