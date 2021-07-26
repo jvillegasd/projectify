@@ -8,10 +8,6 @@ env = Env()
 env.read_env()
 
 connect(
-  env('MONGODB_DATABASE'),
-  host=env('MONGODB_SERVER'),
-  port=int(env('MONGODB_PORT')),
-  username=env('MONGODB_ROOT_USERNAME'),
-  password=env('MONGODB_PASSWORD'),
+  host=env('MONGODB_URL'),
   authentication_source='admin'
 )

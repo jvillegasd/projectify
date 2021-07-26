@@ -12,3 +12,4 @@ rq==1.9.0
 redis==3.5.3
 openpyxl==3.0.7
 APScheduler==3.7.0
+dnspython==2.1.0

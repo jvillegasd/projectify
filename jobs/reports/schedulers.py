@@ -2,7 +2,7 @@ import os
 
 def delete_temp_files():
   files = os.listdir('temp')
-  print(files, 'aaa', flush=True)
+  
   filtered_files = [
     file
     for file in files
