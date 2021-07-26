@@ -11,13 +11,13 @@ def upload_file_to_s3(filename, bucket=None, object_name=None):
   if not object_name:
     object_name = filename
   if not bucket:
-    bucket = env('BUCKETEER_AWS_BUCKET_NAME')
+    bucket = env('BUCKETEER_BUCKET_NAME')
   
   s3_client = boto3.client(
     service_name='s3',
     region_name=env('BUCKETEER_AWS_REGION'),
-    aws_access_key_id=env('BUCKETEER_AWS_ACCESS_KEY'),
-    aws_secret_access_key=env('BUCKETEER_AWS_SECRET')
+    aws_access_key_id=env('BUCKETEER_AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=env('BUCKETEER_AWS_SECRET_ACCESS_KEY')
   )
   try:
     path = os.path.join(UPLOAD_FOLDER, object_name)
@@ -31,13 +31,13 @@ def upload_fileobj_to_s3(file, filename, bucket=None, object_name=None):
   if not object_name:
     object_name = filename
   if not bucket:
-    bucket = env('BUCKETEER_AWS_BUCKET_NAME')
+    bucket = env('BUCKETEER_BUCKET_NAME')
   
   s3_client = boto3.client(
     service_name='s3',
     region_name=env('BUCKETEER_AWS_REGION'),
-    aws_access_key_id=env('BUCKETEER_AWS_ACCESS_KEY'),
-    aws_secret_access_key=env('BUCKETEER_AWS_SECRET')
+    aws_access_key_id=env('BUCKETEER_AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=env('BUCKETEER_AWS_SECRET_ACCESS_KEY')
   )
   try:
     path = os.path.join(UPLOAD_FOLDER, object_name)
@@ -51,13 +51,13 @@ def download_file_from_s3(filename, bucket=None, object_name=None):
   if not object_name:
     object_name = filename
   if not bucket:
-    bucket = env('BUCKETEER_AWS_BUCKET_NAME')
+    bucket = env('BUCKETEER_BUCKET_NAME')
   
   s3_client = boto3.client(
     service_name='s3',
     region_name=env('BUCKETEER_AWS_REGION'),
-    aws_access_key_id=env('BUCKETEER_AWS_ACCESS_KEY'),
-    aws_secret_access_key=env('BUCKETEER_AWS_SECRET')
+    aws_access_key_id=env('BUCKETEER_AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=env('BUCKETEER_AWS_SECRET_ACCESS_KEY')
   )
   try:
     path = os.path.join(UPLOAD_FOLDER, object_name)
@@ -69,13 +69,13 @@ def download_file_from_s3(filename, bucket=None, object_name=None):
 
 def create_presigned_url_s3(object_name, bucket=None, expiration_seg=3600):
   if not bucket:
-    bucket = env('BUCKETEER_AWS_BUCKET_NAME')
+    bucket = env('BUCKETEER_BUCKET_NAME')
   
   s3_client = boto3.client(
     service_name='s3',
     region_name=env('BUCKETEER_AWS_REGION'),
-    aws_access_key_id=env('BUCKETEER_AWS_ACCESS_KEY'),
-    aws_secret_access_key=env('BUCKETEER_AWS_SECRET')
+    aws_access_key_id=env('BUCKETEER_AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=env('BUCKETEER_AWS_SECRET_ACCESS_KEY')
   )
   try:
     response = s3_client.generate_presigned_url(
