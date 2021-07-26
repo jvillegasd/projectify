@@ -43,3 +43,7 @@ This is the schema to follow when a user wants to upload a report file
 | ...                                  | ...         | ...                   |
 |                                      |             |                       |
 ```
+
+## Week days
+Week days under ISo standard was handled using Python's library datetime. The method used was `isocalendar()`.
+Week days is used for make validations around duplicate reports on the same week.
